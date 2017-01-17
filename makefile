@@ -16,8 +16,8 @@ OUTPUTBIN		:= flaxc
 
 OUTPUT			:= $(SYSROOT)/$(PREFIX)/bin/$(OUTPUTBIN)
 
-CC				?= "clang"
-CXX				?= "clang++"
+CC				?= "gcc"
+CXX				?= "g++"
 LLVM_CONFIG		?= "llvm-config"
 
 

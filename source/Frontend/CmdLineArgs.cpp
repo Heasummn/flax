@@ -14,8 +14,6 @@
 #include "compiler.h"
 
 
-#include <dlfcn.h>
-
 
 static std::string parseQuotedString(char** argv, int& i)
 {

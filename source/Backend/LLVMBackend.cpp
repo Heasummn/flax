@@ -56,7 +56,7 @@ static llvm::LLVMContext globalContext;
 
 
 #ifdef _WIN32
-errno_t _putenv_s(const char* name, const char* value);
+#include <Windows.h>
 #endif
 
 
@@ -244,7 +244,30 @@ namespace Compiler
 			}
 			else
 			{
-				std::string objname = "/tmp/flax_" + this->linkedModule->getModuleIdentifier();
+				std::string tmpdir = "/tmp/";
+
+				// seriously fuck this shit
+				#ifdef _WIN32
+				{
+					char* buf = new char[1024];
+					auto ret = GetTempPath(1024, (TCHAR*) buf);
+
+					iceAssert(ret);
+
+
+					// ok.
+					tmpdir = buf;
+					delete[] buf;
+				}	
+				#endif
+
+
+
+
+
+
+				// std::string objname = tmpdir + "flax_" + this->linkedModule->getModuleIdentifier();
+				std::string objname = this->outputFilename + ".o";
 
 				int fd = open(objname.c_str(), O_RDWR | O_CREAT, S_IRWXU);
 				if(fd == -1)
@@ -394,7 +417,7 @@ namespace Compiler
 				#endif
 
 				// delete the temp file
-				// std::remove(templ);
+				std::remove(objname.c_str());
 
 				delete[] argv;
 

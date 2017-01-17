@@ -36,4 +36,5 @@ public ffi func fflush(fd: void*) -> i32
 public ffi func ioctl(fd: i32, cmd: u64, ...) -> i32
 
 public ffi func fdopen(fd: i32, mode: i8*) -> void*
+public ffi func _fdopen(fd: i32, mode: i8*) -> void*
 

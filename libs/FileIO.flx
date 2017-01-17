@@ -84,12 +84,14 @@ public func openFile(name: string, mode: FileMode) -> Stream
 	}
 
 	// UNIX:
+	/*
 	let desc = open(name.raw, om)
 	if desc < 0
 	{
 		printf("Invalid file (path %s), failed to open.", name)
 		return Stream()
 	}
+	*/
 
 	return Stream()
 }

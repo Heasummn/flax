@@ -53,7 +53,7 @@ namespace Array
 					fir::FunctionType::getCVariadicFunc({ fir::Type::getVoidPtr(), fir::Type::getInt8Ptr() },
 					fir::Type::getInt32()), fir::LinkageType::External);
 
-				fir::Function* fdopenf = cgi->module->getOrCreateFunction(Identifier("fdopen", IdKind::Name),
+				fir::Function* fdopenf = cgi->module->getOrCreateFunction(Identifier("_fdopen", IdKind::Name),
 					fir::FunctionType::get({ fir::Type::getInt32(), fir::Type::getInt8Ptr() }, fir::Type::getVoidPtr(), false),
 					fir::LinkageType::External);
 
@@ -168,6 +168,7 @@ namespace Array
 			{
 				// sanity check failed
 
+				/*
 				fir::Function* fprintfn = cgi->module->getOrCreateFunction(Identifier("fprintf", IdKind::Name),
 					fir::FunctionType::getCVariadicFunc({ fir::Type::getVoidPtr(), fir::Type::getInt8Ptr() },
 					fir::Type::getInt32()), fir::LinkageType::External);
@@ -182,7 +183,7 @@ namespace Array
 				fir::Value* err = cgi->irb.CreateCall2(fdopenf, fir::ConstantInt::getInt32(2), tmpstr);
 
 				cgi->irb.CreateCall(fprintfn, { err, fmtstr, origlen, origcap });
-
+				*/
 				cgi->irb.CreateCall0(cgi->getOrDeclareLibCFunc("abort"));
 				cgi->irb.CreateUnreachable();
 			}

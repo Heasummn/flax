@@ -142,7 +142,7 @@ public func miscellaneousTests()
 		}
 
 		var ws: winsize
-		ioctl(1, 1074295912 as u64, &ws)
+		// ioctl(1, 1074295912 as u64, &ws)
 
 		printf("terminal size: %hdx%hd (chars), %hdx%hd (pixels)\n", ws.col, ws.row, ws.xpixel, ws.ypixel)
 	}

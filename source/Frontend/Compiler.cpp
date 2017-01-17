@@ -9,6 +9,10 @@
 #include <cstdlib>
 #include <cinttypes>
 
+#include <locale>
+#include <utility>
+#include <codecvt>
+
 #include <sys/stat.h>
 #include "errors.h"
 #include "parser.h"
@@ -24,6 +28,69 @@
 #include "llvm/IRReader/IRReader.h"
 #include "llvm/Support/raw_ostream.h"
 #include "llvm/Support/MemoryBuffer.h"
+
+// dirty AF.
+#ifdef _WIN32
+#include <Windows.h>
+
+static bool _fileExists(LPCTSTR szPath)
+{
+	DWORD dwAttrib = GetFileAttributes(szPath);
+	return (dwAttrib != INVALID_FILE_ATTRIBUTES && !(dwAttrib & FILE_ATTRIBUTE_DIRECTORY));
+}
+
+
+
+static std::string _getFullPathName(const char* _path)
+{
+	std::string path = _path;
+	std::replace(path.begin(), path.end(), '/', '\\');
+
+	char* out = new char[1024];
+	GetFullPathName((TCHAR*) path.c_str(), 1024, (TCHAR*) out, 0);
+
+	// apparently windows is fucked up, and this function always returns non-zero.
+	// call something else to verify the full path.
+
+	bool ret = _fileExists((TCHAR*) out);
+
+	if(ret == false)
+	{
+		// fprintf(stderr, "file %s does not exist\n", path.c_str());
+		delete[] out;
+		return "";
+	}
+	else
+	{
+		// fprintf(stderr, "getFullPath for %s -- %s (%d) // %d\n", path.c_str(), out, GetLastError(), ret);
+
+		std::string ret = out;
+		delete[] out;
+
+		return ret;
+	}
+
+}
+#else
+static std::string _getFullPathName(const char* path)
+{
+	auto ret = realpath(path, 0);
+	if(ret == 0)
+	{
+		return "";
+	}
+	else
+	{
+		std::string str = ret;
+		free(ret);
+
+		return str;
+	}
+}
+#endif
+
+
+
 
 using namespace Ast;
 
@@ -64,26 +131,23 @@ namespace Compiler
 			if(modname[i] == '.')
 				modname[i] = '/';
 		}
-
+		
 		std::string name = curpath + "/" + modname + ".flx";
-		char* fname = realpath(name.c_str(), 0);
+		std::string fname = _getFullPathName(name.c_str());
 
 		// a file here
-		if(fname != NULL)
+		if(!fname.empty())
 		{
-			auto ret = std::string(fname);
-			free(fname);
-			return getFullPathOfFile(ret);
+			return fname;
 		}
 		else
 		{
-			free(fname);
 			std::string builtinlib = getSysroot() + getPrefix() + modname + ".flx";
 
 			struct stat buffer;
 			if(stat(builtinlib.c_str(), &buffer) == 0)
 			{
-				return getFullPathOfFile(builtinlib);
+				return getFullPathOfFile(builtinlib);;
 			}
 			else
 			{
@@ -427,16 +491,11 @@ namespace Compiler
 
 	std::string getFullPathOfFile(std::string partial)
 	{
-		const char* fullpath = realpath(partial.c_str(), 0);
-		if(fullpath == 0)
+		std::string fullpath = _getFullPathName(partial.c_str());
+		if(fullpath.empty())
 			error("Nonexistent file %s", partial.c_str());
 
-		iceAssert(fullpath);
-
-		std::string ret = fullpath;
-		free((void*) fullpath);
-
-		return ret;
+		return fullpath;
 	}
 }
 
