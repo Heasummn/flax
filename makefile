@@ -16,8 +16,8 @@ OUTPUTBIN		:= flaxc
 
 OUTPUT			:= $(SYSROOT)/$(PREFIX)/bin/$(OUTPUTBIN)
 
-CC				?= "gcc"
-CXX				?= "g++"
+CC				?= "clang"
+CXX				?= "clang++"
 LLVM_CONFIG		?= "llvm-config"
 
 
@@ -122,7 +122,7 @@ $(OUTPUT): $(CXXOBJ) $(COBJ)
 # haha
 clena: clean
 clean:
-	@rm $(OUTPUT)
+	@rm -f $(OUTPUT)
 	@find source -name "*.o" | xargs rm -f
 	@find source -name "*.c.d" | xargs rm -f
 	@find source -name "*.cpp.d" | xargs rm -f

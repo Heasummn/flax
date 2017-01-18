@@ -29,6 +29,8 @@
 #include "llvm/Support/raw_ostream.h"
 #include "llvm/Support/MemoryBuffer.h"
 
+#include <experimental/filesystem>
+
 // dirty AF.
 #ifdef _WIN32
 #include <Windows.h>
@@ -74,6 +76,17 @@ static std::string _getFullPathName(const char* _path)
 #else
 static std::string _getFullPathName(const char* path)
 {
+	// using namespace std::experimental;
+	// auto p = filesystem::path(path);
+	// if(filesystem::exists(p))
+	// {
+	// 	return filesystem::canonical(p).string();
+	// }
+	// else
+	// {
+	// 	return "";
+	// }
+
 	auto ret = realpath(path, 0);
 	if(ret == 0)
 	{
@@ -131,7 +144,7 @@ namespace Compiler
 			if(modname[i] == '.')
 				modname[i] = '/';
 		}
-		
+
 		std::string name = curpath + "/" + modname + ".flx";
 		std::string fname = _getFullPathName(name.c_str());
 
